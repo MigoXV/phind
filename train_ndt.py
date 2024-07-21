@@ -23,21 +23,20 @@ def train_from_scratch(config):
     )
 
     df = h5py.File(config.data_dict_json_path, 'r')
-    data = zip(df['wave'], df['label'])
+    data = list(zip(df['wave'], df['label']))
     val_data = None
     if config.val_data_dict_json_path:
         df_val = h5py.File(config.val_data_dict_json_path, 'r')
-        val_data = zip(df_val['wave'], df_val['label'])
+        val_data = list(zip(df_val['wave'], df_val['label']))
 
     data_feeder = DataFeeder(
-        data_feeder_config=config,
+        datafeeder_config=config,
         data=data,
         val_data=val_data,
-        reporter=reporter,
         dataset_class=DatasetNDT,
         collate_fn = train_collate_fn
     )
-    batch_postprocessor = TrainBatchPostProcessor()
+    batch_postprocessor = TrainBatchPostProcessor(config.feature_extractor)
     model = models[config.model_name]().to(config.device)
     # model = Net(hidden_size=256, num_classes=len(ALPHABET) + 1).to(config.device)
     if config.ckpt_path:
@@ -55,7 +54,7 @@ def train_from_scratch(config):
         loss_fn=loss_fn,
         device=config.device,
         reporter=reporter,
-        batch_postprocessor=data_feeder.batch_postprocessor,
+        batch_postprocessor=batch_postprocessor,
         adaptor=adaptor
     )
 
@@ -89,9 +88,9 @@ def train_from_scratch(config):
         train_dataloader=data_feeder.train_dataloader,
         num_epochs=config.num_epochs,
         max_grad_norm=config.max_grad_norm,
-        batch_postprocessor=data_feeder.batch_postprocessor,
+        batch_postprocessor=batch_postprocessor,
     )
 
-    reporter.log_model(
-        checkpoint_dir=config.output_dir, name=config.model_name, type="trained-model"
-    )
+    # reporter.log_model(
+    #     checkpoint_dir=config.output_dir, name=config.model_name, type="trained-model"
+    # )

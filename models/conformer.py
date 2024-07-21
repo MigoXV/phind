@@ -17,7 +17,7 @@ class Net(nn.Module):
         self.hidden_size = hidden_size
 
         # 输入层
-        self.fc1 = nn.Linear(201, self.hidden_size)
+        self.fc1 = nn.Linear(41, self.hidden_size)
 
         self.conformer = torchaudio.models.Conformer(
             input_dim=hidden_size,
@@ -26,12 +26,11 @@ class Net(nn.Module):
             dropout=drop_prob,
             depthwise_conv_kernel_size=33,
             ffn_dim=512,
-            batch_first=True,
         )
         # 输出层
         self.fc2 = nn.Linear(hidden_size, 1)
         self.positional_encoding = create_positional_encoding(
-            5000, 512
+            5000, hidden_size
         )        
 
     def forward(self, *batch: torch.Tensor) -> torch.Tensor:
@@ -44,12 +43,11 @@ class Net(nn.Module):
             torch.Tensor: 前向传播的输出结果。
         """
         x = batch[0]
-        x = x.squeeze(1)
         
-        input_length = batch[2]
-        
+        input_length = batch[1]
+        x = self.fc1(x)
         x = x + self.positional_encoding[:, : x.size(1), :].to(x.device)
         x, _ = self.conformer(x, input_length)
-        x = self.fc2(x[:-1])
+        x = self.fc2(x[:,0:1,:])
         x = x.squeeze()
         return x

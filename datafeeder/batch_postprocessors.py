@@ -16,7 +16,7 @@ class BatchPostProcessor:
     def __call__(self, batch: tuple) -> tuple:
         signals = batch
 
-        spectrograms = [self.postprocess(signal) for signal in signals]
+        spectrograms = [self.postprocess(torch.tensor(signal)) for signal in signals]
         input_lengths = torch.tensor(
             [spectrogram.shape[0] for spectrogram in spectrograms]
         )
@@ -28,7 +28,7 @@ class BatchPostProcessor:
         return spectrograms, input_lengths
 
     def postprocess(self, signal: torch.Tensor) -> torch.Tensor:
-        spectrogram = self.spectrogram_transform(signal).squeeze(0).T
+        spectrogram = self.spectrogram_transform(signal.unsqueeze(0)).squeeze(0).T
 
         # 归一化和标准化
         spectrogram = (spectrogram - spectrogram.mean()) / spectrogram.std()
@@ -40,7 +40,7 @@ class TrainBatchPostProcessor(BatchPostProcessor):
     def __call__(self, batch: tuple) -> tuple:
         signals, labels = batch
 
-        spectrograms = [self.postprocess(signal) for signal in signals]
+        spectrograms = [self.postprocess(torch.tensor(signal)) for signal in signals]
         input_lengths = torch.tensor(
             [spectrogram.shape[0] for spectrogram in spectrograms]
         )
@@ -49,4 +49,5 @@ class TrainBatchPostProcessor(BatchPostProcessor):
             spectrograms, batch_first=True, padding_value=0
         )
 
+        labels = torch.tensor(labels)
         return spectrograms, input_lengths, labels

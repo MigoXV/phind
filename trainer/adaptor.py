@@ -22,7 +22,7 @@ class Adaptor:
 
     def get_metrics(self, batch: tuple, model_outputs: torch.Tensor) -> dict:
         # 解包batch和model_outputs
-        _, labels = batch
+        _, *_, labels = batch
 
         loss = self.loss_fn(model_outputs, labels)
 
