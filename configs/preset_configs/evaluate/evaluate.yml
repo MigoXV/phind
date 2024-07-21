@@ -1,0 +1,12 @@
+# 数据集路径
+data_dict_json_path: datasets/test_dataset_01/noisy_labels.json
+
+# 模型保存目录和checkpoint路径
+checkpoint_path: outputs/selected_models/attention_gs9576.pkl
+
+val_batch_size: 256
+device: cpu
+
+num_workers: 0
+
+model_name: attention

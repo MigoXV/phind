@@ -1,0 +1,40 @@
+extra_val_json_path: null
+
+# 模型参数
+model_name: conformer
+
+# 特征工程参数
+feature_extractor:
+  hop_length: 20
+  win_length: 80
+  n_fft: 80
+
+log_dir: outputs/logs
+
+# 测试集大小
+test_size: 0.001
+
+# 训练过程参数
+num_epochs: 20
+train_batch_size: 64
+val_batch_size: 64
+weight_decay: 0.001
+gradient_accumulation_steps: 1
+learning_rate: 1e-4
+device: cuda
+ckpt_epoch_frequency: 1
+max_grad_norm: -1.0
+num_workers: 0
+lr_type: warmup_cos
+lr_params:
+  warmup_epochs: 5
+  min_lr: 1e-6
+
+# 训练策略
+evaluation_strategy: epoch
+logging_dir: ./logs
+save_strategy: epoch
+
+# wandb选项
+report_to: wandb
+wandb_project: ndt

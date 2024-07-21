@@ -1,0 +1,5 @@
+length_range: [0, 50]
+pitch_range: [900, 1100]
+words_per_minutes_range: [40, 50]
+amplitude_range: [10, 150]
+snr_range: [-10, 2]
